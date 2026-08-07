@@ -56,3 +56,10 @@ INSERT INTO predictions (fight_id, predictor_id, predicted_winner_id, probabilit
 INSERT INTO predictions (fight_id, predictor_id, predicted_winner_id, probability) VALUES
 (1, 4, 1, 0.52);
 
+
+-- Прогнозы на Бой 2 (Makhachev vs Tsarukyan)
+INSERT INTO predictions (fight_id, predictor_id, predicted_winner_id, probability) VALUES
+(2, 1, 3, 0.70), -- me -> Makhachev (70%)
+(2, 2, 3, 0.65), -- GPT-4o -> Makhachev (65%)
+(2, 3, 4, 0.55), -- DeepSeek-V3 -> Tsarukyan (55%)
+(2, 4, 3, 0.60); -- Claude-3.5 -> Makhachev (60%)
