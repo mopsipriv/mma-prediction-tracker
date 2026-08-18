@@ -53,20 +53,17 @@ func (r *FighterRepository) GetByID(ctx context.Context, id int64) (*models.Figh
 		SELECT id, first_name, last_name, nickname, weight_class, created_at
 		FROM fighters
 		WHERE id = $1`
-	
-	var f models.Fighter
 
-	for rows.Next() {
-		var f models.Fighter
-		err := r.db.QueryRowContext(ctx,query,id).Scan(
-			&f.ID,
-			&f.FirstName,
-			&f.LastName,
-			&f.Nickname,
-			&f.WeightClass,
-			&f.CreatedAt,
-		)
-		if err != nil {
+	var f models.Fighter
+	err := r.db.QueryRowContext(ctx,query,id).Scan(
+		&f.ID,
+		&f.FirstName,
+		&f.LastName,
+		&f.Nickname,
+		&f.WeightClass,
+		&f.CreatedAt,
+	)
+	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
@@ -75,3 +72,5 @@ func (r *FighterRepository) GetByID(ctx context.Context, id int64) (*models.Figh
 
 	return &f, nil
 }
+
+
