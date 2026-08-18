@@ -1,16 +1,20 @@
+package repository
+
 import (
-	"context",
-	"database/sql",
-	"fmt",
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+
 	"mma-prediction-tracker/internal/models"
 )
 
-func FighterRepository struct {
+type FighterRepository struct {
 	db *sql.DB
 }
 
 func NewFighterRepository(db *sql.DB) *FighterRepository {
-	return &FighterRepository{db:db}
+	return &FighterRepository{db: db}
 }
 
 func (r *FighterRepository) GetAll(ctx context.Context) ([]models.Fighter, error) {
@@ -48,14 +52,14 @@ func (r *FighterRepository) GetAll(ctx context.Context) ([]models.Fighter, error
 	return fighters, nil
 }
 
-func (r *FighterRepository) GetByID(ctx context.Context, id int64) (*models.Fighter,error){
+func (r *FighterRepository) GetByID(ctx context.Context, id int64) (*models.Fighter, error) {
 	query := `
 		SELECT id, first_name, last_name, nickname, weight_class, created_at
 		FROM fighters
 		WHERE id = $1`
 
 	var f models.Fighter
-	err := r.db.QueryRowContext(ctx,query,id).Scan(
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&f.ID,
 		&f.FirstName,
 		&f.LastName,
@@ -73,4 +77,24 @@ func (r *FighterRepository) GetByID(ctx context.Context, id int64) (*models.Figh
 	return &f, nil
 }
 
+func (r *FighterRepository) Create(ctx context.Context, fighter *models.Fighter) error {
+	query := `
+		INSERT INTO fighters(first_name, last_name, nickname, weight_class)
+		VALUES ($1, $2, $3, $4) 
+		RETURNING id, created_at`
 
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		fighter.FirstName,
+		fighter.LastName,
+		fighter.Nickname,
+		fighter.WeightClass,
+	).Scan(&fighter.ID, &fighter.CreatedAt)
+
+	if err != nil {
+		return fmt.Errorf("failed to create fighter: %w", err)
+	}
+
+	return nil
+}
