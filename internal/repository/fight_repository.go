@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"mma-prediction-tracker/internal/models"
@@ -46,5 +47,34 @@ func (r *FightRepository) GetAll(ctx context.Context) ([]models.Fight, error){
 		}
 		fights = append(fights,f)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
 	return fights,nil
+}
+
+func (r *FightRepository) GetByID(ctx context.Context, id int64) (*models.Fight, error) {
+	query := `
+		SELECT id, event_id, fighter_1_id, fighter_2_id, winner_id, weight_class, created_at
+		FROM fights
+		WHERE id = $1`
+
+	var f models.Fight
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&f.ID,
+		&f.EventID,
+		&f.Fighter1ID, 
+		&f.Fighter2ID, 
+		&f.WinnerID, 
+		&f.WeightClass, 
+		&f.CreatedAt,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get fight by id: %w", err)
+	}
+
+	return &f, nil
 }
