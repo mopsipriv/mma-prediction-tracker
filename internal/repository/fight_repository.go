@@ -78,3 +78,26 @@ func (r *FightRepository) GetByID(ctx context.Context, id int64) (*models.Fight,
 
 	return &f, nil
 }
+
+func (r *FightRepository) SetWinner(ctx context.Context, fightID int64, winnerID int64) error {
+	query := `
+		UPDATE fights
+		SET winner_id = $1
+		WHERE id = $2`
+
+	result, err := r.db.ExecContext(ctx, query, winnerID, fightID)
+	if err != nil {
+		return fmt.Errorf("failed to set fight winner: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("fight with id %d not found", fightID)
+	}
+
+	return nil
+}
