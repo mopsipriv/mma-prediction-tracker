@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS predictions (
     predicted_method VARCHAR(50) CHECK (predicted_method IN ('KO/TKO', 'Submission', 'Decision', 'Any')),
     predicted_round INT CHECK (predicted_round BETWEEN 1 AND 5),
     reasoning TEXT,                                   -- Detailed AI / human breakdown
-    
+        
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_predictor_per_fight UNIQUE (fight_id, predictor_id)
 );
